@@ -49,13 +49,14 @@ public class Eigenvector extends JuiceboxCLT {
     private int binSize = 0;
     private Chromosome chromosome1;
     private PrintWriter pw;
+    private int whichEV = 1;
 
     public Eigenvector() {
-        super(getUsage() + "\n\t-p, --pearsons_all_resolutions: calculate eigenvector at all resolutions");
+        super(getUsage() + "\n\t-p, --pearsons_all_resolutions: calculate eigenvector at all resolutions" + "\n\t--ev: which eigenvector to calculate. Default is --ev 1, the principal");
     }
 
     public static String getUsage(){
-        return "eigenvector -p <NONE/VC/VC_SQRT/KR> <hicFile(s)> <chr> <BP/FRAG> <binsize> [outfile]";
+        return "eigenvector --ev <1/2> -p <NONE/VC/VC_SQRT/KR> <hicFile(s)> <chr> <BP/FRAG> <binsize> [outfile]";
     }
 
     @Override
@@ -63,6 +64,8 @@ public class Eigenvector extends JuiceboxCLT {
         if (args.length != 7 && args.length != 6) {
             printUsageAndExit();
         }
+
+        whichEV = parser.getWhichEV();
 
         setDatasetAndNorm(args[2], args[1], false);
 
@@ -127,7 +130,7 @@ public class Eigenvector extends JuiceboxCLT {
             System.exit(13);
         }
         ExpectedValueFunction df = dataset.getExpectedValuesOrExit(zd.getZoom(), norm, chromosome1, true);
-        double[] vector = dataset.getEigenvector(chromosome1, zoom, 0, norm);
+        double[] vector = dataset.getEigenvector(chromosome1, zoom, whichEV - 1, norm);
 
         // mean center and print
         int count = 0;

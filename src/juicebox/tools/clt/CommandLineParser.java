@@ -77,6 +77,7 @@ public class CommandLineParser extends CmdLineParser {
     private final Option threadNumOption = addIntegerOption('j', "threads");
     private final Option matrixThreadNumOption = addIntegerOption("mthreads");
     private final Option v9DepthBaseOption = addIntegerOption("v9-depth-base");
+    private final Option whichEVOption = addIntegerOption("ev");
 
     // sets of strings
     private final Option multipleChromosomesOption = addStringOption('c', "chromosomes");
@@ -255,6 +256,14 @@ public class CommandLineParser extends CmdLineParser {
 
     public int getV9DepthBase() {
         return optionToInt(v9DepthBaseOption);
+    }
+
+    public int getWhichEV() {
+        int ev = optionToInt(whichEVOption);
+        if (ev == 0)
+            ev = 1;
+
+        return ev;
     }
 
     /**
