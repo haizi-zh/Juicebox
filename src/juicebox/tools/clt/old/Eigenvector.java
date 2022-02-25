@@ -38,6 +38,8 @@ import juicebox.windowui.HiCZoom;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class for calculating Eigenvector (separated out from Dump)
@@ -49,7 +51,7 @@ public class Eigenvector extends JuiceboxCLT {
     private int binSize = 0;
     private Chromosome chromosome1;
     private PrintWriter pw;
-    private int whichEV = 1;
+    private List<Integer> whichEV;
 
     public Eigenvector() {
         super(getUsage() + "\n\t-p, --pearsons_all_resolutions: calculate eigenvector at all resolutions" + "\n\t--ev: which eigenvector to calculate. Default is --ev 1, the principal");
@@ -65,7 +67,11 @@ public class Eigenvector extends JuiceboxCLT {
             printUsageAndExit();
         }
 
-        whichEV = parser.getWhichEV();
+        whichEV = parser.getWhichEVOption();
+        if (whichEV == null) {
+            whichEV = new ArrayList<Integer>();
+            whichEV.add(1);
+        }
 
         setDatasetAndNorm(args[2], args[1], false);
 
@@ -130,26 +136,37 @@ public class Eigenvector extends JuiceboxCLT {
             System.exit(13);
         }
         ExpectedValueFunction df = dataset.getExpectedValuesOrExit(zd.getZoom(), norm, chromosome1, true);
-        double[] vector = dataset.getEigenvector(chromosome1, zoom, whichEV - 1, norm);
 
-        // mean center and print
-        int count = 0;
-        double total = 0;
+        List<double[]> eigenvectors = new ArrayList<double[]>();
+        for (int ev : whichEV) {
+            double[] vector = dataset.getEigenvector(chromosome1, zoom, ev - 1, norm);
+            // mean center and print
+            int count = 0;
+            double total = 0;
 
-        for (double element : vector) {
-            if (!Double.isNaN(element)) {
-                total += element;
-                count++;
+            for (double element : vector) {
+                if (!Double.isNaN(element)) {
+                    total += element;
+                    count++;
+                }
             }
-        }
 
-        double mean = total / count; // sum is now mean
+            double mean = total / count; // sum is now mean
+            for (int idx = 0; idx < vector.length; idx++) {
+                vector[idx] = vector[idx] - mean;
+            }
+            eigenvectors.add(vector);
+        }
 
         // print out vector
-        for (double element : vector) {
-            pw.println(element - mean);
+        for (int idx = 0; idx < eigenvectors.get(0).length; idx++) {
+            List<String> valueList = new ArrayList<String>();
+            for (int valueIdx = 0; valueIdx < eigenvectors.size(); valueIdx++) {
+                valueList.add(String.valueOf((eigenvectors.get(valueIdx))[idx]));
+            }
+            String row = String.join("\t", valueList);
+            pw.println(row);
         }
         pw.close();
-
     }
 }

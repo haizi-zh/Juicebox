@@ -77,12 +77,12 @@ public class CommandLineParser extends CmdLineParser {
     private final Option threadNumOption = addIntegerOption('j', "threads");
     private final Option matrixThreadNumOption = addIntegerOption("mthreads");
     private final Option v9DepthBaseOption = addIntegerOption("v9-depth-base");
-    private final Option whichEVOption = addIntegerOption("ev");
 
     // sets of strings
     private final Option multipleChromosomesOption = addStringOption('c', "chromosomes");
     private final Option resolutionOption = addStringOption('r', "resolutions");
     private final Option randomizePositionMapsOption = addStringOption("frag-site-maps");
+    private final Option whichEVOption = addStringOption("ev");
 
     //set of ints
     private final Option multipleMapQOption = addStringOption("mapqs");
@@ -258,14 +258,6 @@ public class CommandLineParser extends CmdLineParser {
         return optionToInt(v9DepthBaseOption);
     }
 
-    public int getWhichEV() {
-        int ev = optionToInt(whichEVOption);
-        if (ev == 0)
-            ev = 1;
-
-        return ev;
-    }
-
     /**
      * double flags
      */
@@ -302,6 +294,10 @@ public class CommandLineParser extends CmdLineParser {
     }
 
     public Set<String> getRandomizePositionMaps() {return optionToStringSet(randomizePositionMapsOption);}
+
+    public List<Integer> getWhichEVOption() {
+        return optionToIntList(whichEVOption);
+    }
 
     /**
      * Int Set flags
